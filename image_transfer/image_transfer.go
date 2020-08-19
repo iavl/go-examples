@@ -25,6 +25,7 @@ func getByIndex(arr *[][]int, i, j, m, n int) (int, bool) {
 func getAvg(arr *[][]int, i, j, m, n int) int {
 	count := 0
 	sum := 0
+
 	if t, ok := getByIndex(arr, i-1, j-1, m, n); ok {
 		sum += t
 		count++
@@ -72,22 +73,15 @@ func process(ch chan task, wg *sync.WaitGroup) {
 	wg.Done()
 }
 
-func main() {
-	var arr = [][]int{
-		{1, 1, 1},
-		{1, 0, 1},
-		{1, 1, 1},
-	}
-
+func calc(res *[][]int, arr *[][]int) {
 	m, n := len(arr), len(arr[0])
-	res := arr
 
 	ch := make(chan task, 100)
 
 	// generator
 	for i := 0; i < m; i++ {
 		for j := 0; j < n; j++ {
-			t := task{&res, &arr, i, j, m, n}
+			t := task{res, arr, i, j, m, n}
 			ch <- t
 		}
 	}
@@ -102,6 +96,15 @@ func main() {
 		wg.Wait()
 		close(ch)
 	}()
+}
+func main() {
+	var arr = [][]int{
+		{1, 1, 1},
+		{1, 0, 1},
+		{1, 1, 1},
+	}
+	res := arr
+	calc(&res, &arr)
 
 	for _, item := range res {
 		fmt.Println(item)
