@@ -21,7 +21,6 @@ func main() {
 	visitAll = func(items []string) {
 		fmt.Println(fmt.Sprintf("visit items: %v", items))
 		for _, item := range items {
-			//fmt.Println(fmt.Sprintf("%s: %v", item, visited[item]))
 			if !visited[item] {
 				visited[item] = true
 				if v, ok := edge[item]; ok {
