@@ -7,22 +7,22 @@ import (
 )
 
 type task struct {
-	res *[][]int
-	arr *[][]int
+	res [][]int
+	arr [][]int
 	i   int
 	j   int
 	m   int
 	n   int
 }
 
-func getByIndex(arr *[][]int, i, j, m, n int) (int, bool) {
+func getByIndex(arr [][]int, i, j, m, n int) (int, bool) {
 	if i == -1 || j == -1 || i == m || j == n {
 		return 0, false
 	}
-	return (*arr)[i][j], true
+	return arr[i][j], true
 }
 
-func getAvg(arr *[][]int, i, j, m, n int) int {
+func getAvg(arr [][]int, i, j, m, n int) int {
 	count := 0
 	sum := 0
 
@@ -68,14 +68,12 @@ func getAvg(arr *[][]int, i, j, m, n int) int {
 
 func process(ch chan task, wg *sync.WaitGroup) {
 	for t := range ch {
-		(*t.res)[t.i][t.j] = getAvg(t.arr, t.i, t.j, t.m, t.n)
+		t.res[t.i][t.j] = getAvg(t.arr, t.i, t.j, t.m, t.n)
 	}
 	wg.Done()
 }
 
-func calc(res *[][]int, arr *[][]int) {
-	m, n := len(arr), len(arr[0])
-
+func calc(res [][]int, arr [][]int, m, n int) {
 	ch := make(chan task, 100)
 
 	// generator
@@ -97,6 +95,7 @@ func calc(res *[][]int, arr *[][]int) {
 		close(ch)
 	}()
 }
+
 func main() {
 	var arr = [][]int{
 		{1, 1, 1},
@@ -104,7 +103,9 @@ func main() {
 		{1, 1, 1},
 	}
 	res := arr
-	calc(&res, &arr)
+	m, n := len(arr), len(arr[0])
+
+	calc(res, arr, m, n)
 
 	for _, item := range res {
 		fmt.Println(item)
