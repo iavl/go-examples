@@ -25,14 +25,19 @@ func DFS(candidates []int, start, target int) {
 	fmt.Println(fmt.Sprintf("target: %v", target))
 
 	if target == 0 {
+		fmt.Println(fmt.Sprintf("---path---: %v", path))
+
+		// 防止path被后续的结果覆盖
 		tmp := make([]int, len(path))
 		copy(tmp, path)
+
 		result = append(result, tmp)
 		return
 	}
 
 	for i := start; i < len(candidates); i++ {
 		fmt.Println(fmt.Sprintf("target: %v", target))
+		fmt.Println(fmt.Sprintf("candidates: %v", candidates[i:]))
 
 		if target-candidates[i] >= 0 {
 			path = append(path, candidates[i])
@@ -42,7 +47,7 @@ func DFS(candidates []int, start, target int) {
 			path = path[:len(path)-1]
 			fmt.Println(fmt.Sprintf("pop %v, path %v", p, path))
 		} else {
-			fmt.Println(fmt.Sprintf("target [%v] < [%v], continue", target, candidates[i]))
+			fmt.Println(fmt.Sprintf("skip [%v]", candidates[i]))
 		}
 	}
 
