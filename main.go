@@ -1,21 +1,27 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"time"
-
-	PC "github.com/iavl/go-examples/channel"
 )
 
 func main() {
-	data := make(chan int)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
 
-	go PC.Producer("producer1", data)
-	go PC.Producer("producer2", data)
-	go PC.Consumer("consumer1", data)
-	go PC.Consumer("consumer2", data)
+	go handle(ctx, 500*time.Millisecond)
+	select {
+	case <-ctx.Done():
+		fmt.Println("main", ctx.Err())
+	}
+}
 
-	time.Sleep(18 * time.Second)
-	close(data)
-	time.Sleep(18 * time.Second)
-
+func handle(ctx context.Context, duration time.Duration) {
+	select {
+	case <-ctx.Done():
+		fmt.Println("handle", ctx.Err())
+	case <-time.After(duration):
+		fmt.Println("process request with", duration)
+	}
 }

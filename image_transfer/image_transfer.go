@@ -23,9 +23,8 @@ func getByIndex(arr [][]int, i, j, m, n int) (int, bool) {
 }
 
 func getAvg(arr [][]int, i, j, m, n int) int {
-	count := 0
-	sum := 0
-
+	var count int
+	var sum int
 	if t, ok := getByIndex(arr, i-1, j-1, m, n); ok {
 		sum += t
 		count++
@@ -66,13 +65,6 @@ func getAvg(arr [][]int, i, j, m, n int) int {
 	return int(r)
 }
 
-func process(ch chan task, wg *sync.WaitGroup) {
-	for t := range ch {
-		t.res[t.i][t.j] = getAvg(t.arr, t.i, t.j, t.m, t.n)
-	}
-	wg.Done()
-}
-
 func calc(res [][]int, arr [][]int, m, n int) {
 	ch := make(chan task, 100)
 
@@ -84,14 +76,21 @@ func calc(res [][]int, arr [][]int, m, n int) {
 		}
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(5)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(5)
 	for i := 0; i < 5; i++ {
-		go process(ch, &wg)
+		go func(ch chan task, wg *sync.WaitGroup) {
+			for t := range ch {
+				t.res[t.i][t.j] = getAvg(t.arr, t.i, t.j, t.m, t.n)
+			}
+			wg.Done()
+		}(ch, &waitGroup)
 	}
 
 	go func() {
-		wg.Wait()
+		// Wait for everything to be processed.
+		waitGroup.Wait()
+
 		close(ch)
 	}()
 }
